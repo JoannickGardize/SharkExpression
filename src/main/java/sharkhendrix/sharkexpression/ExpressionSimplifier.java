@@ -11,10 +11,10 @@ import java.util.List;
  */
 public class ExpressionSimplifier implements TokenSequenceFunction {
     @Override
-    public List<ExpressionToken> apply(List<ExpressionToken> expressionTokens) throws InvalidExpressionSyntaxException {
-        List<ExpressionToken> result = new ArrayList<>(expressionTokens.size());
+    public List<Token> apply(List<Token> tokens) throws InvalidExpressionSyntaxException {
+        List<Token> result = new ArrayList<>(tokens.size());
         Operators.TemporaryTernaryRightPart currentTernaryRight = null;
-        for (ExpressionToken token : expressionTokens) {
+        for (Token token : tokens) {
             if (currentTernaryRight != null && !(token instanceof Operators.TemporaryTernaryLeftPart)) {
                 throw new InvalidExpressionSyntaxException("Missing ternary second symbol");
             }
@@ -30,15 +30,15 @@ public class ExpressionSimplifier implements TokenSequenceFunction {
                     throw new InvalidExpressionSyntaxException("Unexpected ternary second symbol");
                 } else {
                     Operators.TemporaryTernaryLeftPart leftPart = (Operators.TemporaryTernaryLeftPart) token;
-                    if (currentTernaryRight.getOperator() != leftPart.operator()) {
+                    if (currentTernaryRight.getOperator() != leftPart.getOperator()) {
                         throw new InvalidExpressionSyntaxException("Ternary symbols mismatch");
                     }
                     if (result.get(result.size() - 1) instanceof ConstantNumber
                             && result.get(result.size() - 2) instanceof ConstantNumber
                             && result.get(result.size() - 3) instanceof ConstantNumber) {
-                        ExpressionToken right = result.remove(result.size() - 1);
-                        ExpressionToken middle = result.remove(result.size() - 1);
-                        ExpressionToken left = result.remove(result.size() - 1);
+                        Token right = result.remove(result.size() - 1);
+                        Token middle = result.remove(result.size() - 1);
+                        Token left = result.remove(result.size() - 1);
                         result.add(new ConstantNumber(currentTernaryRight.getOperator()
                                 .compute(((ConstantNumber) left).getValue(), ((ConstantNumber) middle).getValue(),
                                         ((ConstantNumber) right).getValue())));
@@ -57,15 +57,33 @@ public class ExpressionSimplifier implements TokenSequenceFunction {
             } else if (token instanceof BinaryOperator) {
                 if (result.get(result.size() - 1) instanceof ConstantNumber
                         && result.get(result.size() - 2) instanceof ConstantNumber) {
-                    ExpressionToken right = result.remove(result.size() - 1);
-                    ExpressionToken left = result.remove(result.size() - 1);
+                    Token right = result.remove(result.size() - 1);
+                    Token left = result.remove(result.size() - 1);
                     result.add(new ConstantNumber(((BinaryOperator) token)
                             .compute(((ConstantNumber) left).getValue(), ((ConstantNumber) right).getValue())));
                 } else {
                     result.add(token);
                 }
+            } else if (token instanceof Function) {
+                Function function = (Function) token;
+                if (function.allowsSimplification() && allArgsAreConstant(function.numArgs(), result)) {
+                    FloatStack stack = new FloatStack();
+                    for (int i = 0; i < function.numArgs(); i++) {
+                        stack.push(((ConstantNumber) result.remove(result.size() - 1)).getValue());
+                    }
+                    result.add(new ConstantNumber(function.execute(stack)));
+                }
             }
         }
         return result;
+    }
+
+    private boolean allArgsAreConstant(int argsCount, List<Token> result) {
+        for (int i = 0; i < argsCount; i++) {
+            if (!(result.get(result.size() - 1 - i) instanceof ConstantNumber)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

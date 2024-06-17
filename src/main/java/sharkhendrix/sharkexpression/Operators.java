@@ -16,10 +16,6 @@ public class Operators {
             this.operator = operator;
         }
 
-        public TernaryOperator operator() {
-            return operator;
-        }
-
         public TernaryOperator getOperator() {
             return operator;
         }
@@ -40,10 +36,6 @@ public class Operators {
 
         public TemporaryTernaryRightPart(TernaryOperator operator) {
             this.operator = operator;
-        }
-
-        public TernaryOperator operator() {
-            return operator;
         }
 
         public TernaryOperator getOperator() {

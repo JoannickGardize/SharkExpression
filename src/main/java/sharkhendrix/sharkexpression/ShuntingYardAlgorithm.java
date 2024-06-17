@@ -11,12 +11,14 @@ import java.util.List;
 public class ShuntingYardAlgorithm implements TokenSequenceFunction {
 
     @Override
-    public List<ExpressionToken> apply(List<ExpressionToken> expressionTokens) throws InvalidExpressionSyntaxException {
-        List<ExpressionToken> result = new ArrayList<>(expressionTokens.size());
-        Deque<ExpressionToken> operatorStack = new ArrayDeque<>();
-        for (ExpressionToken token : expressionTokens) {
+    public List<Token> apply(List<Token> tokens) throws InvalidExpressionSyntaxException {
+        List<Token> result = new ArrayList<>(tokens.size());
+        Deque<Token> operatorStack = new ArrayDeque<>();
+        for (Token token : tokens) {
             if (token instanceof Number) {
                 result.add(token);
+            } else if (token instanceof Function) {
+                operatorStack.push(token);
             } else if (token instanceof BinaryOperator || token instanceof UnaryOperator) {
                 while (!operatorStack.isEmpty() && comparePrecedence(operatorStack.peek(), token)) {
                     result.add(operatorStack.pop());
@@ -25,13 +27,13 @@ public class ShuntingYardAlgorithm implements TokenSequenceFunction {
             } else if (token instanceof LeftParenthesis) {
                 operatorStack.push(token);
             } else if (token instanceof RightParenthesis) {
-                while (operatorStack.peek() != LeftParenthesis.getInstance()) {
-                    if (operatorStack.isEmpty()) {
-                        throw new InvalidExpressionSyntaxException("Missing left parenthesis");
-                    }
+                unstackUntilLeftParenthesis(operatorStack, result);
+                operatorStack.pop();
+                if (operatorStack.peek() instanceof Function) {
                     result.add(operatorStack.pop());
                 }
-                operatorStack.pop();
+            } else if (token instanceof ArgSeparator) {
+                unstackUntilLeftParenthesis(operatorStack, result);
             }
         }
         while (!operatorStack.isEmpty()) {
@@ -43,7 +45,16 @@ public class ShuntingYardAlgorithm implements TokenSequenceFunction {
         return result;
     }
 
-    private boolean comparePrecedence(ExpressionToken token1, ExpressionToken token2) {
+    private void unstackUntilLeftParenthesis(Deque<Token> operatorStack, List<Token> result) {
+        while (operatorStack.peek() != LeftParenthesis.getInstance()) {
+            if (operatorStack.isEmpty()) {
+                throw new InvalidExpressionSyntaxException("Missing left parenthesis");
+            }
+            result.add(operatorStack.pop());
+        }
+    }
+
+    private boolean comparePrecedence(Token token1, Token token2) {
         if (token1 instanceof LeftParenthesis) {
             return false;
         } else if (token1 instanceof BinaryOperator) {

@@ -13,7 +13,7 @@ public class FullTest {
         MapVariablePool variablePool = new MapVariablePool();
         variablePool.set("variable1", 2);
         variablePool.set("variable2", 3);
-        factory = ExpressionFactory.createDefault(variablePool);
+        factory = new ExpressionFactory(variablePool);
     }
 
     @Test

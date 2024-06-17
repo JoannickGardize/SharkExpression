@@ -5,6 +5,9 @@ import sharkhendrix.sharkexpression.token.TernaryOperator;
 
 public class DefaultOperators {
 
+    private DefaultOperators() {
+    }
+
     public static void apply(Operators operators) {
 
         // Mathematical operators
@@ -188,7 +191,7 @@ public class DefaultOperators {
 
             @Override
             public int precedence() {
-                return -20;
+                return -30;
             }
         }, "|", "||", "or");
     }

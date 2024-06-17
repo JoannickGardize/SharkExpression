@@ -3,7 +3,7 @@ package sharkhendrix.sharkexpression;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sharkhendrix.sharkexpression.token.ConstantNumber;
-import sharkhendrix.sharkexpression.token.ExpressionToken;
+import sharkhendrix.sharkexpression.token.Token;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,7 +17,7 @@ class ExpressionSimplifierTest {
         // infix: abc >= 3 ? 0 ? 1 : 2 * 3 + 3 : 3
         // postfix: abc 3 >= 0 1 2 3 * 3 + ?: 3 ?:
         // simplified: abc 3 >= 9 3 ?:
-        List<ExpressionToken> tokens = Arrays.asList(
+        List<Token> tokens = Arrays.asList(
                 abc,
                 new ConstantNumber(3),
                 gte,
@@ -35,7 +35,7 @@ class ExpressionSimplifierTest {
                 temporaryTernaryLeftPart
         );
 
-        List<ExpressionToken> expected = Arrays.asList(
+        List<Token> expected = Arrays.asList(
                 abc,
                 new ConstantNumber(3),
                 gte,
@@ -43,7 +43,7 @@ class ExpressionSimplifierTest {
                 new ConstantNumber(3),
                 ternary
         );
-        List<ExpressionToken> actual = new ExpressionSimplifier().apply(tokens);
+        List<Token> actual = new ExpressionSimplifier().apply(tokens);
         Assertions.assertEquals(expected, actual);
     }
 }

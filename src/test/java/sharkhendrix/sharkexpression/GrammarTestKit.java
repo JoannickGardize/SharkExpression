@@ -1,9 +1,6 @@
 package sharkhendrix.sharkexpression;
 
-import sharkhendrix.sharkexpression.token.BinaryOperator;
-import sharkhendrix.sharkexpression.token.TernaryOperator;
-import sharkhendrix.sharkexpression.token.UnaryOperator;
-import sharkhendrix.sharkexpression.token.VariableNumber;
+import sharkhendrix.sharkexpression.token.*;
 
 public class GrammarTestKit {
 
@@ -57,7 +54,8 @@ public class GrammarTestKit {
     public static final Operators.TemporaryTernaryRightPart temporaryTernaryRightPart = new Operators.TemporaryTernaryRightPart(ternary);
     public static final Operators.TemporaryTernaryLeftPart temporaryTernaryLeftPart = new Operators.TemporaryTernaryLeftPart(ternary);
 
-    public static final ExpressionGrammar grammar = new ExpressionGrammar() {
+    public static final Function.TwoArgs max = Math::max;
+    public static final Grammar grammar = new Grammar() {
         @Override
         public UnaryOperator getUnaryOperator(String operator) {
             return operator.equals("-") ? negative : null;
@@ -90,6 +88,11 @@ public class GrammarTestKit {
             } else {
                 return null;
             }
+        }
+
+        @Override
+        public Function getFunction(String name) {
+            return name.equals("max") ? max : null;
         }
     };
 }

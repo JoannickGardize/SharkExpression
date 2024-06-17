@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.PrimitiveIterator;
 
 /**
- * <p>This class is responsible for "tokenizing" expression strings into a list of {@link ExpressionToken}.
+ * <p>This class is responsible for "tokenizing" expression strings into a list of {@link Token}.
  */
 public class Tokenizer {
 
-    protected final ExpressionGrammar grammar;
+    protected final Grammar grammar;
 
-    public Tokenizer(ExpressionGrammar grammar) {
+    public Tokenizer(Grammar grammar) {
         this.grammar = grammar;
     }
 
@@ -23,11 +23,11 @@ public class Tokenizer {
         SYMBOL
     }
 
-    public List<ExpressionToken> tokenize(String str) throws InvalidExpressionSyntaxException {
+    public List<Token> tokenize(String str) throws InvalidExpressionSyntaxException {
         PrimitiveIterator.OfInt codePointsIt = str.codePoints().iterator();
         StringBuilder stringBuilder = new StringBuilder();
         TokenType currentType = null;
-        List<ExpressionToken> tokens = new ArrayList<>();
+        List<Token> tokens = new ArrayList<>();
         boolean gotTheDot = false;
         int charCount = 0;
         while (codePointsIt.hasNext()) {
@@ -60,14 +60,19 @@ public class Tokenizer {
                     currentType = TokenType.WORD;
                 }
                 stringBuilder.appendCodePoint(c);
-            } else if (c == grammar.leftParenthesis()) {
+            } else if (grammar.isLeftParenthesis(c)) {
                 addToken(currentType, stringBuilder, tokens);
                 tokens.add(LeftParenthesis.getInstance());
                 gotTheDot = false;
                 currentType = null;
-            } else if (c == grammar.rightParenthesis()) {
+            } else if (grammar.isRightParenthesis(c)) {
                 addToken(currentType, stringBuilder, tokens);
                 tokens.add(RightParenthesis.getInstance());
+                gotTheDot = false;
+                currentType = null;
+            } else if (c == grammar.functionArgsSeparator()) {
+                addToken(currentType, stringBuilder, tokens);
+                tokens.add(ArgSeparator.getInstance());
                 gotTheDot = false;
                 currentType = null;
             } else {
@@ -84,7 +89,7 @@ public class Tokenizer {
         return tokens;
     }
 
-    private void addToken(TokenType currentType, StringBuilder stringBuilder, List<ExpressionToken> tokens) throws InvalidExpressionSyntaxException {
+    private void addToken(TokenType currentType, StringBuilder stringBuilder, List<Token> tokens) throws InvalidExpressionSyntaxException {
         if (currentType == null) {
             return;
         }
@@ -95,11 +100,15 @@ public class Tokenizer {
                 tokens.add(new ConstantNumber(Float.parseFloat(str)));
                 break;
             case WORD:
-                VariableNumber variableNumber = grammar.getVariable(str);
-                if (variableNumber == null) {
-                    addOperator(tokens, str);
+                Token token = grammar.getVariable(str);
+                if (token == null) {
+                    token = grammar.getFunction(str);
                 }
-                tokens.add(variableNumber);
+                if (token == null) {
+                    addOperator(tokens, str);
+                } else {
+                    tokens.add(token);
+                }
                 break;
             case SYMBOL:
                 addOperator(tokens, str);
@@ -107,8 +116,8 @@ public class Tokenizer {
         }
     }
 
-    private void addOperator(List<ExpressionToken> tokens, String str) throws InvalidExpressionSyntaxException {
-        ExpressionToken operator = shouldBeUnaryOperator(tokens) ?
+    private void addOperator(List<Token> tokens, String str) throws InvalidExpressionSyntaxException {
+        Token operator = shouldBeUnaryOperator(tokens) ?
                 grammar.getUnaryOperator(str) : grammar.getBinaryOperator(str);
         if (operator == null) {
             throw new InvalidExpressionSyntaxException("Unknown symbol: " + str);
@@ -116,11 +125,11 @@ public class Tokenizer {
         tokens.add(operator);
     }
 
-    private boolean shouldBeUnaryOperator(List<ExpressionToken> tokens) {
+    private boolean shouldBeUnaryOperator(List<Token> tokens) {
         if (tokens.isEmpty()) {
             return true;
         }
-        ExpressionToken previousToken = tokens.get(tokens.size() - 1);
+        Token previousToken = tokens.get(tokens.size() - 1);
         return previousToken instanceof BinaryOperator || previousToken instanceof LeftParenthesis;
     }
 }

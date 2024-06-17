@@ -1,24 +1,24 @@
 package sharkhendrix.sharkexpression;
 
-import sharkhendrix.sharkexpression.token.ExpressionToken;
 import sharkhendrix.sharkexpression.token.Number;
 import sharkhendrix.sharkexpression.token.Operator;
+import sharkhendrix.sharkexpression.token.Token;
 
 /**
  * Not thread-safe.
  */
 public class Expression {
 
-    private final ExpressionToken[] tokens;
+    private final Token[] tokens;
 
     private final FloatStack outputStack = new FloatStack();
 
-    public Expression(ExpressionToken[] tokens) {
+    public Expression(Token[] tokens) {
         this.tokens = tokens;
     }
 
     public float evaluate() {
-        for (ExpressionToken token : tokens) {
+        for (Token token : tokens) {
             if (token instanceof Number) {
                 outputStack.push(((Number) token).getValue());
             } else {
