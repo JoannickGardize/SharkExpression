@@ -3,6 +3,7 @@ package sharkhendrix.sharkexpression;
 import sharkhendrix.sharkexpression.token.Number;
 import sharkhendrix.sharkexpression.token.Operator;
 import sharkhendrix.sharkexpression.token.Token;
+import sharkhendrix.sharkexpression.util.FloatStack;
 
 /**
  * Not thread-safe.

@@ -1,6 +1,6 @@
 package sharkhendrix.sharkexpression.token;
 
-import sharkhendrix.sharkexpression.FloatStack;
+import sharkhendrix.sharkexpression.util.FloatStack;
 
 public interface TernaryOperator extends Operator {
 

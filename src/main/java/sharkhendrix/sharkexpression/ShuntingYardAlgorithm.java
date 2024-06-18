@@ -11,7 +11,7 @@ import java.util.List;
 public class ShuntingYardAlgorithm implements TokenSequenceFunction {
 
     @Override
-    public List<Token> apply(List<Token> tokens) throws InvalidExpressionSyntaxException {
+    public List<Token> apply(List<Token> tokens) {
         List<Token> result = new ArrayList<>(tokens.size());
         Deque<Token> operatorStack = new ArrayDeque<>();
         for (Token token : tokens) {

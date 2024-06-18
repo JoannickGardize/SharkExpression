@@ -17,20 +17,25 @@ public class ExpressionFactory {
 
     private final Tokenizer tokenizer;
     private TokenSequenceFunction[] tokenSequenceFunctions;
+    private final ExpressionValidator validator;
 
-    public ExpressionFactory(VariablePool variablePool) {
-        tokenizer = new Tokenizer(new DefaultGrammar(variablePool));
+    public ExpressionFactory(Variables variables) {
+        Grammar grammar = new Grammar(variables);
+        tokenizer = new Tokenizer(grammar);
         createDefaultTokenSequenceFunctions();
+        validator = new ExpressionValidator(tokenizer, grammar);
     }
 
     public ExpressionFactory(Grammar grammar) {
         tokenizer = new Tokenizer(grammar);
         createDefaultTokenSequenceFunctions();
+        validator = new ExpressionValidator(tokenizer, grammar);
     }
 
-    public ExpressionFactory(Tokenizer tokenizer, TokenSequenceFunction... tokenSequenceFunctions) {
+    public ExpressionFactory(Tokenizer tokenizer, ExpressionValidator validator, TokenSequenceFunction... tokenSequenceFunctions) {
         this.tokenizer = tokenizer;
         this.tokenSequenceFunctions = Arrays.copyOf(tokenSequenceFunctions, tokenSequenceFunctions.length);
+        this.validator = validator;
     }
 
     private void createDefaultTokenSequenceFunctions() {
@@ -40,7 +45,11 @@ public class ExpressionFactory {
         };
     }
 
-    public Expression parse(String expressionStr) throws InvalidExpressionSyntaxException {
+    public List<ValidationError> validate(String expressionStr) {
+        return validator.validate(expressionStr);
+    }
+
+    public Expression parse(String expressionStr) {
         List<Token> tokens = tokenizer.tokenize(expressionStr);
         for (TokenSequenceFunction function : tokenSequenceFunctions) {
             tokens = function.apply(tokens);

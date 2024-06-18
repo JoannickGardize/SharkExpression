@@ -1,4 +1,4 @@
-package sharkhendrix.sharkexpression;
+package sharkhendrix.sharkexpression.util;
 
 
 import java.util.Arrays;

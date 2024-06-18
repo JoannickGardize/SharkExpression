@@ -1,20 +1,11 @@
 package sharkhendrix.sharkexpression.token;
 
-import sharkhendrix.sharkexpression.VariablePool;
+import sharkhendrix.sharkexpression.util.FloatSupplier;
 
-public class VariableNumber implements Number {
-
-    private final VariablePool variablePool;
-    private final int index;
-
-    public VariableNumber(VariablePool variablePool, int index) {
-        this.variablePool = variablePool;
-        this.index = index;
-    }
-
+public interface VariableNumber extends Number, FloatSupplier {
 
     @Override
-    public float getValue() {
-        return variablePool.getValue(index);
+    default float getValue() {
+        return getAsFloat();
     }
 }

@@ -13,7 +13,7 @@ import static sharkhendrix.sharkexpression.GrammarTestKit.*;
 class ExpressionSimplifierTest {
 
     @Test
-    void applyTest() throws InvalidExpressionSyntaxException {
+    void applyTest() {
         // infix: abc >= 3 ? 0 ? 1 : 2 * 3 + 3 : 3
         // postfix: abc 3 >= 0 1 2 3 * 3 + ?: 3 ?:
         // simplified: abc 3 >= 9 3 ?:

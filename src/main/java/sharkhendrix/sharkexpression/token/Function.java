@@ -1,6 +1,6 @@
 package sharkhendrix.sharkexpression.token;
 
-import sharkhendrix.sharkexpression.FloatStack;
+import sharkhendrix.sharkexpression.util.FloatStack;
 
 public interface Function extends Operator {
 
@@ -10,7 +10,7 @@ public interface Function extends Operator {
      * Allows simplification by the {@link sharkhendrix.sharkexpression.ExpressionSimplifier}
      * when the input parameters are all constants.
      *
-     * @return
+     * @return true if the simplification is allowed for this function
      */
     default boolean allowsSimplification() {
         return true;

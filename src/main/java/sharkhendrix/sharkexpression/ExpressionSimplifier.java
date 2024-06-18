@@ -2,6 +2,7 @@ package sharkhendrix.sharkexpression;
 
 import sharkhendrix.sharkexpression.token.Number;
 import sharkhendrix.sharkexpression.token.*;
+import sharkhendrix.sharkexpression.util.FloatStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
  */
 public class ExpressionSimplifier implements TokenSequenceFunction {
     @Override
-    public List<Token> apply(List<Token> tokens) throws InvalidExpressionSyntaxException {
+    public List<Token> apply(List<Token> tokens) {
         List<Token> result = new ArrayList<>(tokens.size());
         Operators.TemporaryTernaryRightPart currentTernaryRight = null;
         for (Token token : tokens) {

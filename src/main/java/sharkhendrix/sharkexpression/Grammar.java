@@ -5,41 +5,63 @@ import sharkhendrix.sharkexpression.token.Function;
 import sharkhendrix.sharkexpression.token.UnaryOperator;
 import sharkhendrix.sharkexpression.token.VariableNumber;
 
-public interface Grammar {
+public class Grammar {
 
-    UnaryOperator getUnaryOperator(String symbol);
+    private final Operators operators;
+    private final Functions functions;
+    private final Variables variables;
 
-    BinaryOperator getBinaryOperator(String symbol);
+    public Grammar(Operators operators, Functions functions, Variables variables) {
+        this.operators = operators;
+        this.functions = functions;
+        this.variables = variables;
+    }
 
-    VariableNumber getVariable(String name);
+    public Grammar(Variables variables) {
+        operators = new Operators();
+        DefaultOperators.apply(operators);
+        functions = new Functions();
+        DefaultFunctions.apply(functions);
+        this.variables = variables;
+    }
 
-    Function getFunction(String name);
+    public UnaryOperator getUnaryOperator(String symbol) {
+        return operators.getUnary(symbol);
+    }
 
-    default boolean isLeftParenthesis(int c) {
+    public BinaryOperator getBinaryOperator(String symbol) {
+        return operators.getBinary(symbol);
+    }
+
+    public VariableNumber getVariable(String name) {
+        return variables.get(name);
+    }
+
+    public Function getFunction(String name) {
+        return functions.get(name);
+    }
+
+    public boolean isLeftParenthesis(int c) {
         return c == '(' || c == '[';
     }
 
-    default boolean isRightParenthesis(int c) {
+    public boolean isRightParenthesis(int c) {
         return c == ')' || c == ']';
     }
 
-    default boolean matchParenthesis(int left, int right) {
+    public boolean matchParenthesis(int left, int right) {
         return left == '(' && right == ')' || left == '[' && right == ']';
     }
 
-    default int functionArgsSeparator() {
+    public int functionArgsSeparator() {
         return ',';
     }
 
-    default int decimalSeparator() {
+    public int decimalSeparator() {
         return '.';
     }
 
-    default boolean isSpecialCharAuthorizedInWords(int c) {
+    public boolean isSpecialCharAuthorizedInWords(int c) {
         return c == '_';
-    }
-
-    default boolean allowMissingParenthesisForNoArgsFunction() {
-        return true;
     }
 }

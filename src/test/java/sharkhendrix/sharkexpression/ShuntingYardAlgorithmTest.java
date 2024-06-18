@@ -12,7 +12,7 @@ import static sharkhendrix.sharkexpression.GrammarTestKit.*;
 class ShuntingYardAlgorithmTest {
 
     @Test
-    void applyTest() throws InvalidExpressionSyntaxException {
+    void applyTest() {
         // 3 + 5 * -vaar * (7 + 9) + 11
         List<Token> tokens = Arrays.asList(
                 new ConstantNumber(3),

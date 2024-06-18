@@ -10,10 +10,10 @@ public class FullTest {
 
     @BeforeAll
     static void initialize() {
-        MapVariablePool variablePool = new MapVariablePool();
-        variablePool.set("variable1", 2);
-        variablePool.set("variable2", 3);
-        factory = new ExpressionFactory(variablePool);
+        Variables variables = new Variables();
+        variables.add("variable1", () -> 2);
+        variables.add("variable2", () -> 3);
+        factory = new ExpressionFactory(variables);
     }
 
     @Test

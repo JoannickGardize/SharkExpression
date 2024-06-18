@@ -38,24 +38,13 @@ public class GrammarTestKit {
         }
     };
     public static final UnaryOperator negative = f -> -f;
-    public static final VariableNumber abc = new VariableNumber(null, 0) {
-        @Override
-        public float getValue() {
-            return 6;
-        }
-    };
-    public static final VariableNumber vaar = new VariableNumber(null, 0) {
-        @Override
-        public float getValue() {
-            return 8;
-        }
-    };
+    public static final VariableNumber abc = () -> 6;
+    public static final VariableNumber vaar = () -> 8;
     public static final TernaryOperator ternary = (v1, v2, v3) -> v1 != 0 ? v2 : v3;
     public static final Operators.TemporaryTernaryRightPart temporaryTernaryRightPart = new Operators.TemporaryTernaryRightPart(ternary);
     public static final Operators.TemporaryTernaryLeftPart temporaryTernaryLeftPart = new Operators.TemporaryTernaryLeftPart(ternary);
-
     public static final Function.TwoArgs max = Math::max;
-    public static final Grammar grammar = new Grammar() {
+    public static final Grammar grammar = new Grammar(null) {
         @Override
         public UnaryOperator getUnaryOperator(String operator) {
             return operator.equals("-") ? negative : null;
