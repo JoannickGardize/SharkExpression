@@ -16,20 +16,13 @@
 
 package sharkhendrix.sharkexpression;
 
-public class InvalidExpressionSyntaxException extends RuntimeException {
+public class DefaultConstants {
 
-    private final int charIndex;
-
-    public InvalidExpressionSyntaxException(String message) {
-        this(message, -1);
+    private DefaultConstants() {
     }
 
-    public InvalidExpressionSyntaxException(String message, int charIndex) {
-        super(charIndex != -1 ? message + " at character " + charIndex : message);
-        this.charIndex = charIndex;
-    }
-
-    public int getCharIndex() {
-        return charIndex;
+    public static void apply(Variables variables) {
+        variables.add("pi", (float) Math.PI);
+        variables.add("e", (float) Math.E);
     }
 }

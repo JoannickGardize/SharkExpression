@@ -1,10 +1,24 @@
+/*
+ * Copyright 2024 Joannick Gardize
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 package sharkhendrix.sharkexpression.token;
 
 import sharkhendrix.sharkexpression.util.FloatStack;
 
-public interface Function extends Operator {
-
-    int numArgs();
+public interface Function extends Token {
 
     /**
      * Allows simplification by the {@link sharkhendrix.sharkexpression.ExpressionSimplifier}
@@ -18,13 +32,9 @@ public interface Function extends Operator {
 
     interface NoArgs extends Function {
 
-        @Override
-        default int numArgs() {
-            return 0;
-        }
-
         /**
-         * No-args functions probably does crazy things like using random values and thus doesn't want to be simplified.
+         * No-args functions probably does crazy things like using random values
+         * and thus doesn't want to be simplified.
          *
          * @return false
          */
