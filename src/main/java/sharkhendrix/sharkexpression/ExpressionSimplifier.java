@@ -16,81 +16,81 @@
 
 package sharkhendrix.sharkexpression;
 
+import sharkhendrix.sharkexpression.token.BinaryOperator;
+import sharkhendrix.sharkexpression.token.ConstantNumber;
 import sharkhendrix.sharkexpression.token.Number;
-import sharkhendrix.sharkexpression.token.*;
+import sharkhendrix.sharkexpression.token.Token;
 import sharkhendrix.sharkexpression.util.FloatStack;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Simplify an expression, by merging constant values with the same precedence.
- * The input tokens should be in postfix notation.
- * <p>In the worst but unusual case, this algorithm has a O(n²) complexity
+ * Simplify an expression to its maximum,
+ * by merging binary operation's constant values with the same precedence,
+ * or by merging any other type of operator and functions when all arguments are constants.
+ * <p>The input tokens should be in postfix notation.
+ * <p>In the worst-case unusual scenario, this algorithm has a O(n²) complexity
  */
-public class ExpressionSimplifier implements TokenSequenceFunction {
+public class ExpressionSimplifier implements TokenPipeline {
+
+    private static class TokenListFloatStackProxy extends FloatStack {
+
+        private final List<Token> tokens;
+
+        public TokenListFloatStackProxy(List<Token> tokens) {
+            super(0);
+            this.tokens = tokens;
+        }
+
+        @Override
+        public void push(float e) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public float pop() {
+            return ((ConstantNumber) tokens.remove(tokens.size() - 1)).getValue();
+        }
+    }
 
     @Override
-    public List<Token> apply(List<Token> tokens) {
-        List<Token> result = new ArrayList<>(tokens.size());
-        for (Token token : tokens) {
+    public void apply(List<Token> input, List<Token> output) {
+        FloatStack stack = new TokenListFloatStackProxy(output);
+        for (Token token : input) {
             if (token instanceof Number) {
-                result.add(token);
-            } else if (token instanceof TernaryOperator) {
-                if (allArgsAreConstant(3, result)) {
-                    Token right = result.remove(result.size() - 1);
-                    Token middle = result.remove(result.size() - 1);
-                    Token left = result.remove(result.size() - 1);
-                    result.add(new ConstantNumber(((TernaryOperator) token)
-                            .compute(((ConstantNumber) left).getValue(), ((ConstantNumber) middle).getValue(),
-                                    ((ConstantNumber) right).getValue())));
-                } else {
-                    result.add(token);
-                }
-            } else if (token instanceof UnaryOperator) {
-                if (result.get(result.size() - 1) instanceof ConstantNumber) {
-                    result.add(new ConstantNumber(((UnaryOperator) token)
-                            .compute(((ConstantNumber) result.remove(result.size() - 1)).getValue())));
-                } else {
-                    result.add(token);
-                }
+                output.add(token);
             } else if (token instanceof BinaryOperator) {
-                if (result.get(result.size() - 1) instanceof ConstantNumber) {
+                if (output.get(output.size() - 1) instanceof ConstantNumber
+                        && token.allowsSimplification()) {
                     BinaryOperator currentOperator = (BinaryOperator) token;
-                    int leftConstantIndex = findLeftCompatibleConstant(result.size() - 2, currentOperator, result);
+                    int leftConstantIndex = findLeftCompatibleConstant(output.size() - 2, currentOperator, output);
                     if (leftConstantIndex != -1) {
-                        Token right = result.remove(result.size() - 1);
-                        result.set(leftConstantIndex, new ConstantNumber(
+                        Token right = output.remove(output.size() - 1);
+                        output.set(leftConstantIndex, new ConstantNumber(
                                 currentOperator.compute(
-                                        ((ConstantNumber) result.get(leftConstantIndex)).getValue(),
+                                        ((ConstantNumber) output.get(leftConstantIndex)).getValue(),
                                         ((ConstantNumber) right).getValue())));
                     } else {
-                        result.add(token);
+                        output.add(token);
                     }
                 } else {
-                    result.add(token);
+                    output.add(token);
                 }
-            } else if (token instanceof Function) {
-                Function function = (Function) token;
-                if (function.allowsSimplification() && allArgsAreConstant(function.numArgs(), result)) {
-                    FloatStack stack = new FloatStack();
-                    for (int i = 0; i < function.numArgs(); i++) {
-                        stack.push(((ConstantNumber) result.remove(result.size() - 1)).getValue());
-                    }
-                    result.add(new ConstantNumber(function.execute(stack)));
+            } else {
+                if (token.allowsSimplification() && allArgsAreConstant(token.numArgs(), output)) {
+                    output.add(new ConstantNumber(token.execute(stack)));
                 } else {
-                    result.add(function);
+                    output.add(token);
                 }
             }
         }
-        return result;
     }
 
-    private int findLeftCompatibleConstant(int startIndex, BinaryOperator operator, List<Token> result) {
+    private int findLeftCompatibleConstant(int startIndex, BinaryOperator operator, List<Token> output) {
         int numberCountdown = 1;
         int currentPrecedence = operator.precedence();
         for (int i = startIndex; i >= 0; i--) {
-            Token token = result.get(i);
+            Token token = output.get(i);
             numberCountdown += token.numArgs() - 1;
             if (token instanceof Number) {
                 if (numberCountdown == 0
@@ -113,9 +113,9 @@ public class ExpressionSimplifier implements TokenSequenceFunction {
         return -1;
     }
 
-    private boolean allArgsAreConstant(int argsCount, List<Token> result) {
+    private boolean allArgsAreConstant(int argsCount, List<Token> output) {
         for (int i = 0; i < argsCount; i++) {
-            if (!(result.get(result.size() - 1 - i) instanceof ConstantNumber)) {
+            if (!(output.get(output.size() - 1 - i) instanceof ConstantNumber)) {
                 return false;
             }
         }

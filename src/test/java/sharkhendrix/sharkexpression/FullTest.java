@@ -19,6 +19,7 @@ package sharkhendrix.sharkexpression;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import sharkhendrix.sharkexpression.grammar.Variables;
 
 public class FullTest {
 
@@ -43,8 +44,6 @@ public class FullTest {
 
     @Test
     void fullTest2() {
-        // 20 x / 2 /
-        //
         Expression exp = factory.parse("2^2^4");
         Assertions.assertEquals(65536, exp.evaluate());
     }

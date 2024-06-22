@@ -16,6 +16,7 @@
 
 package sharkhendrix.sharkexpression;
 
+import sharkhendrix.sharkexpression.grammar.Grammar;
 import sharkhendrix.sharkexpression.token.Number;
 import sharkhendrix.sharkexpression.token.*;
 

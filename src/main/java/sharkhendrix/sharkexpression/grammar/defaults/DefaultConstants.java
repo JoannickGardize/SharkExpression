@@ -14,7 +14,9 @@
  *    limitations under the License.
  */
 
-package sharkhendrix.sharkexpression;
+package sharkhendrix.sharkexpression.grammar.defaults;
+
+import sharkhendrix.sharkexpression.grammar.Variables;
 
 public class DefaultConstants {
 

@@ -14,8 +14,11 @@
  *    limitations under the License.
  */
 
-package sharkhendrix.sharkexpression;
+package sharkhendrix.sharkexpression.grammar;
 
+import sharkhendrix.sharkexpression.grammar.defaults.DefaultConstants;
+import sharkhendrix.sharkexpression.grammar.defaults.DefaultFunctions;
+import sharkhendrix.sharkexpression.grammar.defaults.DefaultOperators;
 import sharkhendrix.sharkexpression.token.BinaryOperator;
 import sharkhendrix.sharkexpression.token.Function;
 import sharkhendrix.sharkexpression.token.Number;
@@ -199,7 +202,7 @@ public class Grammar {
     /**
      * Set the decimal separator for numbers. The default value is '.'.
      *
-     * @param decimalSeparator
+     * @param decimalSeparator the decimal separator used for numbers
      * @return this for method chaining style
      */
     public Grammar setDecimalSeparator(int decimalSeparator) {

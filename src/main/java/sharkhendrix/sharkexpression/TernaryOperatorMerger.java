@@ -16,22 +16,21 @@
 
 package sharkhendrix.sharkexpression;
 
+import sharkhendrix.sharkexpression.grammar.Operators;
 import sharkhendrix.sharkexpression.token.Token;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Merge ternary operators into their final forms.
  * The input tokens should be in postfix notation.
  */
-public class TernaryOperatorMerger implements TokenSequenceFunction {
+public class TernaryOperatorMerger implements TokenPipeline {
 
     @Override
-    public List<Token> apply(List<Token> tokens) {
-        List<Token> result = new ArrayList<>(tokens.size());
+    public void apply(List<Token> input, List<Token> output) {
         Operators.TemporaryTernaryRightPart currentTernaryRight = null;
-        for (Token token : tokens) {
+        for (Token token : input) {
             if (currentTernaryRight != null && !(token instanceof Operators.TemporaryTernaryLeftPart)) {
                 throw new InvalidExpressionSyntaxException("Missing ternary second symbol");
             } else if (token instanceof Operators.TemporaryTernaryRightPart) {
@@ -47,13 +46,12 @@ public class TernaryOperatorMerger implements TokenSequenceFunction {
                     if (currentTernaryRight.getOperator() != leftPart.getOperator()) {
                         throw new InvalidExpressionSyntaxException("Ternary symbols mismatch");
                     }
-                    result.add(currentTernaryRight.getOperator());
+                    output.add(currentTernaryRight.getOperator());
                     currentTernaryRight = null;
                 }
             } else {
-                result.add(token);
+                output.add(token);
             }
         }
-        return result;
     }
 }

@@ -34,6 +34,16 @@ public interface Token {
     }
 
     /**
+     * Allows simplification by the {@link sharkhendrix.sharkexpression.ExpressionSimplifier}
+     * when the input parameters are all constants.
+     *
+     * @return true if the simplification is allowed for this token
+     */
+    default boolean allowsSimplification() {
+        return true;
+    }
+
+    /**
      * Execute this token, it must pop() as many times as the return value of numArgs().
      *
      * @param output the output stack of the expression execution,

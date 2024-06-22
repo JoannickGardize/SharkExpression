@@ -19,6 +19,7 @@ package sharkhendrix.sharkexpression;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sharkhendrix.sharkexpression.token.ConstantNumber;
+import sharkhendrix.sharkexpression.token.Function;
 import sharkhendrix.sharkexpression.token.Token;
 
 import java.util.Arrays;
@@ -45,7 +46,7 @@ class ExpressionTest {
                 new ConstantNumber(11),
                 plus
         );
-        Expression expression = new Expression(tokens.toArray(new Token[tokens.size()]));
+        Expression expression = new StandaloneExpression(tokens.toArray(new Token[0]));
 
         Assertions.assertEquals(-626, expression.evaluate());
     }
@@ -69,7 +70,7 @@ class ExpressionTest {
                 new ConstantNumber(3),
                 ternary
         };
-        Expression expression = new Expression(tokens);
+        Expression expression = new StandaloneExpression(tokens);
 
         Assertions.assertEquals(9, expression.evaluate());
     }
@@ -87,8 +88,33 @@ class ExpressionTest {
                 max,
                 plus
         };
-        Expression expression = new Expression(tokens);
+        Expression expression = new StandaloneExpression(tokens);
 
         Assertions.assertEquals(6, expression.evaluate());
+    }
+
+    @Test
+    void functionArgsOrderTest() {
+        Function function = (Function.FourArgs) (a, b, c, d) -> {
+            if (a != 1) {
+                Assertions.fail("First arg is not 1");
+            }
+            if (b != 2) {
+                Assertions.fail("Second arg is not 2");
+            }
+            if (c != 3) {
+                Assertions.fail("Third arg is not 3");
+            }
+            if (d != 4) {
+                Assertions.fail("Fourth arg is not 4");
+            }
+            return 1;
+        };
+        new StandaloneExpression(new Token[]{
+                new ConstantNumber(1),
+                new ConstantNumber(2),
+                new ConstantNumber(3),
+                new ConstantNumber(4),
+                function}).evaluate();
     }
 }

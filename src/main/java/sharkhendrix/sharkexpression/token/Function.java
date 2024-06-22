@@ -20,16 +20,6 @@ import sharkhendrix.sharkexpression.util.FloatStack;
 
 public interface Function extends Token {
 
-    /**
-     * Allows simplification by the {@link sharkhendrix.sharkexpression.ExpressionSimplifier}
-     * when the input parameters are all constants.
-     *
-     * @return true if the simplification is allowed for this function
-     */
-    default boolean allowsSimplification() {
-        return true;
-    }
-
     interface NoArgs extends Function {
 
         /**

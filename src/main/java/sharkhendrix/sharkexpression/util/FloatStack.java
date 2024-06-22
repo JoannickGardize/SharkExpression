@@ -69,6 +69,10 @@ public class FloatStack {
         }
     }
 
+    public int size() {
+        return size;
+    }
+
     private void ensureCapacity() {
         if (elements.length == size) {
             elements = Arrays.copyOf(elements, elements.length + 10);

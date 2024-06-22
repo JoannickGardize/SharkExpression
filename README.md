@@ -23,6 +23,7 @@ The design allows to produce multiple Expressions sharing the same variable cont
 
 * Use of float primitives, not double (I designed it for the context of a video game).
 * Unnecessary branches of the expression are always computed (i.e. no logical operator smartness).
+* Immature framework, may contain bugs.
 
 ## Sample
 
@@ -85,7 +86,7 @@ grammar.functions()
         .add("my@function", (a, b) -> myFunction());
 
 grammar.operators()
-        .add("⋅", DefaultOperators.MULTIPLY)
+        .add("⋅", DefaultOperators.MULTIPLY) // Add synonym to '*'
         .add("#", new BinaryOperator() {
             @Override
             public float compute(float leftSide, float rightSide) {
@@ -99,5 +100,4 @@ grammar.operators()
         });
 
 ExpressionFactory factory = new ExpressionFactory(grammar);
-
 ```

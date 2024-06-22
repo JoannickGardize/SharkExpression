@@ -20,23 +20,49 @@ import sharkhendrix.sharkexpression.token.Token;
 import sharkhendrix.sharkexpression.util.FloatStack;
 
 /**
- * A parsed expression. this implement is not thread-safe.
+ * A parsed expression.
+ * This implementation does not hold a working FloatStack,
+ * so the method evaluate() is not supported,
+ * call evaluate(FloatStack) instead.
  */
 public class Expression {
 
     private final Token[] tokens;
 
-    private final FloatStack outputStack;
-
     public Expression(Token[] tokens) {
-        outputStack = new FloatStack(Math.min(tokens.length / 2 + 1, 10));
         this.tokens = tokens;
     }
 
+    /**
+     * Evaluate this expression.
+     *
+     * @return the result of the expression
+     */
     public float evaluate() {
+        throw new UnsupportedOperationException("This is not a standalone expression," +
+                "call instead evaluate(FloatStack) or setup the ExpressionFactory to build StandAloneExpression.");
+    }
+
+    /**
+     * Evaluate this expression.
+     *
+     * @param outputStack the working FloatStack used to evaluate the expression,
+     *                    it is intended to be empty,
+     *                    but it will work with a non-empty outputStack.
+     *                    After this method, the outputStack remains unchanged.
+     * @return the result of the expression
+     */
+    public float evaluate(FloatStack outputStack) {
         for (Token token : tokens) {
             outputStack.push(token.execute(outputStack));
         }
         return outputStack.pop();
+    }
+
+    /**
+     * @return the number of token this expression is made of
+     */
+    public int tokenLength() {
+        return tokens.length;
     }
 }

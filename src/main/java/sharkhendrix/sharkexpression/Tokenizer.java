@@ -16,6 +16,7 @@
 
 package sharkhendrix.sharkexpression;
 
+import sharkhendrix.sharkexpression.grammar.Grammar;
 import sharkhendrix.sharkexpression.token.*;
 
 import java.util.ArrayList;

@@ -16,14 +16,19 @@
 
 package sharkhendrix.sharkexpression;
 
+import sharkhendrix.sharkexpression.grammar.Grammar;
+import sharkhendrix.sharkexpression.grammar.Variables;
 import sharkhendrix.sharkexpression.token.Token;
+import sharkhendrix.sharkexpression.util.FloatStack;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * Builder of {@link Expression} Object from expression sentence.
- * Also, able to validate expressions.
+ * Also provide an expression validation method.
  * <p>
  * Expression build steps:
  * <ol>
@@ -36,8 +41,9 @@ import java.util.List;
 public class ExpressionFactory {
 
     private final Tokenizer tokenizer;
-    private TokenSequenceFunction[] tokenSequenceFunctions;
+    private TokenPipeline[] tokenPipelines;
     private final ExpressionValidator validator;
+    private Function<Token[], Expression> expressionConstructor = StandaloneExpression::new;
 
     /**
      * Creates an ExpressionFactory with a default Grammar and the given Variables.
@@ -65,14 +71,33 @@ public class ExpressionFactory {
     /**
      * Create an ExpressionFactory made with the given parameters.
      *
-     * @param tokenizer              the tokenizer to use to parse expressions
-     * @param validator              the validator to use to validate the expressions
-     * @param tokenSequenceFunctions the sequence of tokenSequenceFunctions to execute to build the expressions
+     * @param tokenizer      the tokenizer to use to parse expressions
+     * @param validator      the validator to use to validate the expressions
+     * @param tokenPipelines the sequence of TokenPipeline to execute to build the expressions
      */
-    public ExpressionFactory(ExpressionValidator validator, Tokenizer tokenizer, TokenSequenceFunction... tokenSequenceFunctions) {
+    public ExpressionFactory(ExpressionValidator validator, Tokenizer tokenizer, TokenPipeline... tokenPipelines) {
         this.validator = validator;
         this.tokenizer = tokenizer;
-        this.tokenSequenceFunctions = Arrays.copyOf(tokenSequenceFunctions, tokenSequenceFunctions.length);
+        this.tokenPipelines = Arrays.copyOf(tokenPipelines, tokenPipelines.length);
+    }
+
+    /**
+     * <i>Performance optimization topic.</i>
+     *
+     * <p>Set the Expression type built by this factory. {@link StandaloneExpression} is built by default.
+     *
+     * <p>StandaloneExpression holds a working FloatStack, so {@link Expression#evaluate()} should be called.
+     * {@link Expression} does not hold such a FloatStack, so {@link Expression#evaluate(FloatStack)} must be called.
+     *
+     * @param buildStandAloneExpression true to build StandaloneExpressions, false to build Expressions,
+     *                                  that requires an external FloatStack to work.
+     */
+    public void buildStandAloneExpression(boolean buildStandAloneExpression) {
+        if (buildStandAloneExpression) {
+            expressionConstructor = StandaloneExpression::new;
+        } else {
+            expressionConstructor = Expression::new;
+        }
     }
 
     /**
@@ -123,7 +148,7 @@ public class ExpressionFactory {
     }
 
     private void createDefaultTokenSequenceFunctions() {
-        tokenSequenceFunctions = new TokenSequenceFunction[]{
+        tokenPipelines = new TokenPipeline[]{
                 new ShuntingYardAlgorithm(),
                 new TernaryOperatorMerger(),
                 new ExpressionSimplifier()
@@ -131,9 +156,14 @@ public class ExpressionFactory {
     }
 
     private Expression buildExpression(List<Token> tokens) {
-        for (TokenSequenceFunction function : tokenSequenceFunctions) {
-            tokens = function.apply(tokens);
+        List<Token> output = new ArrayList<>(tokens.size());
+        for (TokenPipeline function : tokenPipelines) {
+            output.clear();
+            function.apply(tokens, output);
+            List<Token> tmp = tokens;
+            tokens = output;
+            output = tmp;
         }
-        return new Expression(tokens.toArray(new Token[tokens.size()]));
+        return expressionConstructor.apply(tokens.toArray(new Token[0]));
     }
 }

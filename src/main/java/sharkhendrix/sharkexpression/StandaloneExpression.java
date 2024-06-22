@@ -17,9 +17,22 @@
 package sharkhendrix.sharkexpression;
 
 import sharkhendrix.sharkexpression.token.Token;
+import sharkhendrix.sharkexpression.util.FloatStack;
 
-import java.util.List;
+/**
+ * A parsed Expression.
+ * This implementation holds a working FloatStack and is not thread-safe.
+ */
+public class StandaloneExpression extends Expression {
 
-public interface TokenSequenceFunction {
-    List<Token> apply(List<Token> tokens);
+    private final FloatStack outputStack;
+
+    public StandaloneExpression(Token[] tokens) {
+        super(tokens);
+        outputStack = new FloatStack(Math.min(tokens.length / 2 + 1, 10));
+    }
+
+    public float evaluate() {
+        return evaluate(outputStack);
+    }
 }

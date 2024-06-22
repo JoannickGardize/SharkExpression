@@ -14,8 +14,9 @@
  *    limitations under the License.
  */
 
-package sharkhendrix.sharkexpression;
+package sharkhendrix.sharkexpression.grammar.defaults;
 
+import sharkhendrix.sharkexpression.grammar.Operators;
 import sharkhendrix.sharkexpression.token.BinaryOperator;
 import sharkhendrix.sharkexpression.token.TernaryOperator;
 import sharkhendrix.sharkexpression.token.UnaryOperator;

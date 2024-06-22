@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package sharkhendrix.sharkexpression;
+package sharkhendrix.sharkexpression.grammar;
 
 import sharkhendrix.sharkexpression.token.Function;
 

@@ -20,53 +20,51 @@ import sharkhendrix.sharkexpression.token.Number;
 import sharkhendrix.sharkexpression.token.*;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
-public class ShuntingYardAlgorithm implements TokenSequenceFunction {
+public class ShuntingYardAlgorithm implements TokenPipeline {
+
 
     @Override
-    public List<Token> apply(List<Token> tokens) {
-        List<Token> result = new ArrayList<>(tokens.size());
+    public void apply(List<Token> input, List<Token> output) {
         Deque<Token> operatorStack = new ArrayDeque<>();
-        for (Token token : tokens) {
+        for (Token token : input) {
             if (token instanceof Number) {
-                result.add(token);
+                output.add(token);
             } else if (token instanceof Function) {
                 operatorStack.push(token);
             } else if (token instanceof BinaryOperator || token instanceof UnaryOperator) {
                 while (!operatorStack.isEmpty() && comparePrecedence(operatorStack.peek(), token)) {
-                    result.add(operatorStack.pop());
+                    output.add(operatorStack.pop());
                 }
                 operatorStack.push(token);
             } else if (token instanceof LeftParenthesis) {
                 operatorStack.push(token);
             } else if (token instanceof RightParenthesis) {
-                unstackUntilLeftParenthesis(operatorStack, result);
+                unstackUntilLeftParenthesis(operatorStack, output);
                 operatorStack.pop();
                 if (operatorStack.peek() instanceof Function) {
-                    result.add(operatorStack.pop());
+                    output.add(operatorStack.pop());
                 }
             } else if (token instanceof ArgSeparator) {
-                unstackUntilLeftParenthesis(operatorStack, result);
+                unstackUntilLeftParenthesis(operatorStack, output);
             }
         }
         while (!operatorStack.isEmpty()) {
             if (operatorStack.peek() instanceof LeftParenthesis) {
                 throw new InvalidExpressionSyntaxException("Missing left parenthesis");
             }
-            result.add(operatorStack.pop());
+            output.add(operatorStack.pop());
         }
-        return result;
     }
 
-    private void unstackUntilLeftParenthesis(Deque<Token> operatorStack, List<Token> result) {
+    private void unstackUntilLeftParenthesis(Deque<Token> operatorStack, List<Token> output) {
         while (operatorStack.peek() != LeftParenthesis.getInstance()) {
             if (operatorStack.isEmpty()) {
                 throw new InvalidExpressionSyntaxException("Missing left parenthesis");
             }
-            result.add(operatorStack.pop());
+            output.add(operatorStack.pop());
         }
     }
 
