@@ -85,6 +85,7 @@ grammar.functions()
         .add("my@function", (a, b) -> myFunction());
 
 grammar.operators()
+        .remove("^")
         .add("⋅", DefaultOperators.MULTIPLY) // Add synonym to '*'
         .add("#", new BinaryOperator() {
             @Override
