@@ -82,7 +82,6 @@ grammar.variables()
         .add("y", () -> getY());
 
 grammar.functions()
-        .remove("^")
         .add("my@function", (a, b) -> myFunction());
 
 grammar.operators()
